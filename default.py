@@ -1,7 +1,14 @@
 import urllib,urllib2,re,xbmcplugin,xbmcgui
 
 def CATEGORIES():
-        addDir('Season 14','http://www.xepisodes.com/southpark/season/14.html',1,'http://www.thetvdb.com/banners/seasons/75897-14.jpg')
+        req = urllib2.Request('http://www.xepisodes.com/')
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        response = urllib2.urlopen(req)
+        link=response.read()
+        response.close()
+        match=re.compile('<a href="(.+?)" title="South Park - Season .+?">(.+?)</a>').findall(link)
+        for url,name in match:
+			addDir(name,url,1,'')
                        
 def INDEX(url):
         req = urllib2.Request(url)
@@ -11,7 +18,7 @@ def INDEX(url):
         response.close()
         match=re.compile('<td class=\'tdseason\'>\n<a href=\'(.+?)\'>\n<img  src=\'(.+?)\'.+?\n</a>\n.+?\n-\n<strong><b>\n(.+?)<br />\n</b></strong>').findall(link)
         for url,thumbnail,name in match:
-                addDir(name,'http://www.xepisodes.com/'+url,2,thumbnail)
+			addDir(name,'http://xepisodes.com/'+url,2,thumbnail)
 
 def VIDEOLINKS(url,name):
         req = urllib2.Request(url)
@@ -21,7 +28,7 @@ def VIDEOLINKS(url,name):
         response.close()
         match=re.compile('<embed src="http\://www.4shared.com//flash/player.swf\?file=(.+?)" width="590" height="430" allowfullscreen="true" allowscriptaccess="always"></embed>').findall(link)
         for url in match:
-                addLink(name,url,'')
+            addLink(name,url,'')
         
 
                 
