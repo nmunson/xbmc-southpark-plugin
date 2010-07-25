@@ -1,6 +1,7 @@
-import urllib,urllib2,re,xbmcplugin,xbmcgui
+import urllib,urllib2,re,xbmcplugin,xbmcgui,os
 
 HEADER = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3'
+BASE_PLUGIN_THUMBNAIL_PATH = os.path.join( os.getcwd(), "thumbnails" )
 
 def ShowSeasons():
 	req = urllib2.Request('http://www.xepisodes.com/')
@@ -10,10 +11,9 @@ def ShowSeasons():
 	response.close()
 	match=re.compile('<a href="(.+?)" title="South Park - Season .+?">(.+?)</a>').findall(link)
 	for url,name in match:
-		li=xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage="DefaultFolder.png")
+		li=xbmcgui.ListItem(name, iconImage=os.path.join( BASE_PLUGIN_THUMBNAIL_PATH, "dvdcover.jpg" ), thumbnailImage=os.path.join( BASE_PLUGIN_THUMBNAIL_PATH, "dvdcover.jpg" ))
 		u=sys.argv[0]+"?mode=1&name="+urllib.quote_plus(name)+"&url="+urllib.quote_plus(url)
 		xbmcplugin.addDirectoryItem(int(sys.argv[1]),u,li,True)
-
 		
 		       
 def ShowEpisodes(url):
@@ -22,11 +22,11 @@ def ShowEpisodes(url):
 	response = urllib2.urlopen(req)
 	link=response.read()
 	response.close()
-	match=re.compile('<td class=\'tdseason\'>\n<a href=\'(.+?)\'>\n<img  src=\'(.+?)\'.+?\n</a>\n.+?\n-\n<strong><b>\n(.+?)<br />\n</b></strong>').findall(link)
-	for url,thumb,name in match:
-		li=xbmcgui.ListItem(name, iconImage=thumb, thumbnailImage=thumb)
-		li.setInfo( type="Video", infoLabels={ "Title": name } )
-		u=sys.argv[0]+"?mode=2&name="+urllib.quote_plus(name)+"&url="+urllib.quote_plus('http://xepisodes.com/'+url)
+	match=re.compile('<td class=\'tdseason\'>\n<a href=\'(.+?)\'>\n<img  src=\'(.+?)\'.+?\n</a>\n(.+?)\n-\n<strong><b>\n(.+?)<br />\n</b></strong>').findall(link)
+	for url,thumb,epnum,name in match:
+		li=xbmcgui.ListItem(epnum+" - "+name, iconImage=thumb, thumbnailImage=thumb)
+		li.setInfo( type="Video", infoLabels={ "Title": epnum+" - "+name } )
+		u=sys.argv[0]+"?mode=2&name="+urllib.quote_plus(epnum+" - "+name)+"&url="+urllib.quote_plus('http://xepisodes.com/'+url)
 		xbmcplugin.addDirectoryItem(int(sys.argv[1]),u,li)
 
 
