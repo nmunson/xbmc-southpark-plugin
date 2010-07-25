@@ -38,14 +38,14 @@ def PlayVideo(url,name):
 	response.close()
 	if "4shared" in link:
 		match=re.compile('<embed src="http\://www.4shared.com//flash/player.swf\?file=(.+?)" width="590" height="430" allowfullscreen="true" allowscriptaccess="always"></embed>').findall(link)
+		g_thumbnail = xbmc.getInfoImage( "ListItem.Thumb" )
+		liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=g_thumbnail)
+		liz.setInfo( type="Video", infoLabels={ "Title": name } )
+		xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(str(match[0]),liz)
 	elif "novamov" in link:
-		print "found novamov"
+		print "Found: novamov"
+		#todo
 
-	g_thumbnail = xbmc.getInfoImage( "ListItem.Thumb" )
-	liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=g_thumbnail)
-	liz.setInfo( type="Video", infoLabels={ "Title": name } )
-	xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(str(match[0]),liz)
-		
 
 def get_params():
 	param=[]
