@@ -36,7 +36,11 @@ def PlayVideo(url,name):
 	response = urllib2.urlopen(req)
 	link=response.read()
 	response.close()
-	match=re.compile('<embed src="http\://www.4shared.com//flash/player.swf\?file=(.+?)" width="590" height="430" allowfullscreen="true" allowscriptaccess="always"></embed>').findall(link)
+	if "4shared" in link:
+		match=re.compile('<embed src="http\://www.4shared.com//flash/player.swf\?file=(.+?)" width="590" height="430" allowfullscreen="true" allowscriptaccess="always"></embed>').findall(link)
+	elif "novamov" in link:
+		print "found novamov"
+
 	g_thumbnail = xbmc.getInfoImage( "ListItem.Thumb" )
 	liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=g_thumbnail)
 	liz.setInfo( type="Video", infoLabels={ "Title": name } )
