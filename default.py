@@ -37,14 +37,25 @@ def PlayVideo(url,name):
 	link=response.read()
 	response.close()
 	if "4shared" in link:
+		print "Found: 4shared"
 		match=re.compile('<embed src="http\://www.4shared.com//flash/player.swf\?file=(.+?)" width="590" height="430" allowfullscreen="true" allowscriptaccess="always"></embed>').findall(link)
 		g_thumbnail = xbmc.getInfoImage( "ListItem.Thumb" )
 		liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=g_thumbnail)
 		liz.setInfo( type="Video", infoLabels={ "Title": name } )
-		xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(str(match[0]),liz)
+		xbmc.Player().play(str(match[0]),liz)
 	elif "novamov" in link:
 		print "Found: novamov"
-		#todo
+		match=re.compile('<iframe style=\'overflow: hidden; border: 0; width: 590px; height: 430px; margin-top: 0px;\' src=\'(.+?)\' scrolling=\'no\'></iframe>').findall(link)
+		req = urllib2.Request(str(match[0]))
+		req.add_header('User-Agent', HEADER)
+		response = urllib2.urlopen(req)
+		link=response.read()
+		response.close()
+		match=re.compile('s1.addVariable\("file","(.+?)"\)').findall(link)
+		g_thumbnail = xbmc.getInfoImage( "ListItem.Thumb" )
+		liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=g_thumbnail)
+		liz.setInfo( type="Video", infoLabels={ "Title": name } )
+		xbmc.Player().play(str(match[0]),liz)
 
 
 def get_params():
