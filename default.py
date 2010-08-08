@@ -4,12 +4,7 @@ HEADER = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008
 BASE_PLUGIN_THUMBNAIL_PATH = os.path.join( os.getcwd(), "thumbnails" )
 
 def ShowSeasons():
-	req = urllib2.Request('http://www.xepisodes.com/')
-	req.add_header('User-Agent', HEADER)
-	response = urllib2.urlopen(req)
-	link=response.read()
-	response.close()
-	match=re.compile('<a href="(.+?)" title="South Park - Season .+?">(.+?)</a>').findall(link)
+	match=re.compile('<a href="(.+?)" title="South Park - Season .+?">(.+?)</a>').findall(OpenUrl('http://www.xepisodes.com/'))
 	for url,name in match:
 		li=xbmcgui.ListItem(name, iconImage=os.path.join( BASE_PLUGIN_THUMBNAIL_PATH, "dvdcover.jpg" ), thumbnailImage=os.path.join( BASE_PLUGIN_THUMBNAIL_PATH, "dvdcover.jpg" ))
 		u=sys.argv[0]+"?mode=1&name="+urllib.quote_plus(name)+"&url="+urllib.quote_plus(url)
@@ -17,12 +12,7 @@ def ShowSeasons():
 		
 		       
 def ShowEpisodes(url):
-	req = urllib2.Request(url)
-	req.add_header('User-Agent', HEADER)
-	response = urllib2.urlopen(req)
-	link=response.read()
-	response.close()
-	match=re.compile('<td class=\'tdseason\'>\n<a href=\'(.+?)\'>\n<img  src=\'(.+?)\'.+?\n</a>\n(.+?)\n-\n<strong><b>\n(.+?)<br />\n</b></strong>').findall(link)
+	match=re.compile('<td class=\'tdseason\'>\n<a href=\'(.+?)\'>\n<img  src=\'(.+?)\'.+?\n</a>\n(.+?)\n-\n<strong><b>\n(.+?)<br />\n</b></strong>').findall(OpenUrl(url))
 	for url,thumb,epnum,name in match:
 		li=xbmcgui.ListItem(epnum+" - "+name, iconImage=thumb, thumbnailImage=thumb)
 		li.setInfo( type="Video", infoLabels={ "Title": epnum+" - "+name } )
@@ -31,11 +21,7 @@ def ShowEpisodes(url):
 
 
 def PlayVideo(url,name):
-	req = urllib2.Request(url)
-	req.add_header('User-Agent', HEADER)
-	response = urllib2.urlopen(req)
-	link=response.read()
-	response.close()
+	link=OpenUrl(url)
 	if "4shared" in link:
 		print "Found: 4shared"
 		match=re.compile('<embed src="http\://www.4shared.com//flash/player.swf\?file=(.+?)" width="590" height="430" allowfullscreen="true" allowscriptaccess="always"></embed>').findall(link)
@@ -46,16 +32,20 @@ def PlayVideo(url,name):
 	elif "novamov" in link:
 		print "Found: novamov"
 		match=re.compile('<iframe style=\'overflow: hidden; border: 0; width: 590px; height: 430px; margin-top: 0px;\' src=\'(.+?)\' scrolling=\'no\'></iframe>').findall(link)
-		req = urllib2.Request(str(match[0]))
-		req.add_header('User-Agent', HEADER)
-		response = urllib2.urlopen(req)
-		link=response.read()
-		response.close()
-		match=re.compile('s1.addVariable\("file","(.+?)"\)').findall(link)
+		match=re.compile('s1.addVariable\("file","(.+?)"\)').findall(OpenUrl(str(match[0])))
 		g_thumbnail = xbmc.getInfoImage( "ListItem.Thumb" )
 		liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=g_thumbnail)
 		liz.setInfo( type="Video", infoLabels={ "Title": name } )
 		xbmc.Player().play(str(match[0]),liz)
+
+
+def OpenUrl(url):
+	req = urllib2.Request(url)
+	req.add_header('User-Agent', HEADER)
+	response = urllib2.urlopen(req)
+	link=response.read()
+	response.close()     
+	return link
 
 
 def get_params():
